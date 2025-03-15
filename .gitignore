@@ -172,3 +172,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# all the changes that I made : 
+
+.csv
+.json
