@@ -1,0 +1,39 @@
+# Here there are some queries for validation of the dataset and get more info about the data : 
+
+SELECT COUNT(*) FROM `retail_data_pipeline_dataset.retail_raw_data`;
+
+SELECT 
+  COUNTIF(Transaction_ID IS NULL) AS null_transactions,
+  COUNTIF(Customer_ID IS NULL) AS null_customer,
+  COUNTIF(Date IS NULL) AS null_date,
+  COUNTIF(products IS NULL) AS null_product
+FROM `retail-data-pipeline-453817.retail_data_pipeline_dataset.retail_raw_data`;  
+
+
+SELECT
+  MIN(Date) AS earliest_date,
+  MAX(Date) AS latest_date,
+FROM `retail-data-pipeline-453817.retail_data_pipeline_dataset.retail_raw_data`;
+
+
+SELECT * 
+FROM `retail-data-pipeline-453817.retail_data_pipeline_dataset.retail_raw_data`
+WHERE Date > CURRENT_DATE();
+
+SELECT Transaction_ID,COUNT(*) AS count
+FROM `retail-data-pipeline-453817.retail_data_pipeline_dataset.retail_raw_data`
+GROUP BY(Transaction_ID)
+HAVING count > 1;
+
+
+
+SELECT *
+FROM `retail-data-pipeline-453817.retail_data_pipeline_dataset.retail_raw_data`
+WHERE Total_Purchases < 0;
+
+
+SELECT DISTINCT Payment_Method
+FROM `retail-data-pipeline-453817.retail_data_pipeline_dataset.retail_raw_data`;
+
+
+
