@@ -21,6 +21,7 @@ resource "google_storage_bucket" "retail_data_bucket" {
   name = var.bucket_name
   location = var.region
   project = var.project_id
+  force_destroy = true	
 }
 
 # create a google cloud bigquery
@@ -29,7 +30,7 @@ resource "google_bigquery_dataset" "retail_dataset" {
   dataset_id = var.dataset_name
   location = var.region
   project = var.project_id
-}
+ }
 
 #create a dataproc cluster for spark
 
