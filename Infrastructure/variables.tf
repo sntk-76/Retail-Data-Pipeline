@@ -33,3 +33,7 @@ variable "cluster_region" {
     default = "europe-west1"
 }
 
+variable "transformed_dataset_name" {
+    description = "New dataset for the transformation process"
+    default = "transformed_retail_data_pipeline_dataset"
+}

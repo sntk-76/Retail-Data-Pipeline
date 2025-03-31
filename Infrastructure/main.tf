@@ -32,6 +32,13 @@ resource "google_bigquery_dataset" "retail_dataset" {
   project = var.project_id
  }
 
+
+resource "google_bigquery_dataset" "transformed_retail_dataset" {
+
+  dataset_id = var.transformed_dataset_name
+  location = var.region
+  project = var.project_id
+}
 #create a dataproc cluster for spark
 
 resource "google_dataproc_cluster" "spark_cluster" {
