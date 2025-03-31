@@ -24,8 +24,8 @@ with DAG(
 
     upload_file = LocalFilesystemToGCSOperator(
         task_id="upload_file",
-        src="/opt/airflow/data/new_retail_data.csv",  # Make sure the file is here
-        dst="raw/retail_data.csv",  # GCS path inside bucket
+        src="/opt/airflow/data/final_clean_data.csv",  # Make sure the file is here
+        dst="clean/retail_clean_data.csv",  # GCS path inside bucket
         bucket="retail-data-pipeline-453817-bucket",  # Your GCS bucket name
     )
 
