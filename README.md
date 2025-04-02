@@ -6,20 +6,25 @@ The pipeline starts with the upload of raw CSV retail data to GCS, triggered and
 
 ---
 
+## 📸 Pipeline Architecture Diagram
+
+![Pipeline Diagram](pipeline_diagram.png)
+
 ## 🚀 Pipeline Overview
 
 ```mermaid
 graph LR
-    A[Terraform Setup] --> B[Google Cloud Infrastructure (GCS, BigQuery)]
-    B --> C[Raw Data Upload (Airflow)]
+    A[Terraform Setup] --> B(GCP Infrastructure: GCS & BigQuery)
+    B --> C[Upload Raw Data via Airflow]
     C --> D[Raw Data in GCS Bucket]
-    D --> E[Raw Data Load to BigQuery (Airflow)]
-    D --> F[Jupyter Notebook]
-    F --> G[PySpark Data Transformation]
-    G --> H[Cleaned CSV Export]
-    H --> I[Clean Data Upload to GCS (Airflow)]
-    I --> J[Clean Data to BigQuery (Airflow)]
-    J --> K[Data Visualization in Looker Studio]
+    D --> E[Load Raw Data to BigQuery (Airflow)]
+    D --> F[Jupyter Notebook for Transformation]
+    F --> G[PySpark Data Cleaning & Preprocessing]
+    G --> H[Export Cleaned CSV]
+    H --> I[Upload Cleaned Data to GCS (Airflow)]
+    I --> J[Load Cleaned Data to BigQuery (Airflow)]
+    J --> K[Visualize with Looker Studio]
+
 ```
 
 ---
@@ -106,11 +111,6 @@ Retail-Data-Pipeline/
 - Added filtering options to support stakeholder self-service exploration.
 - Dashboard Link: 👉 [Retail Looker Dashboard](https://lookerstudio.google.com/reporting/32142238-71f8-4c7c-8dc2-45038440d426)
 
----
-
-## 📸 Pipeline Architecture Diagram
-
-![Pipeline Diagram](pipeline_diagram.png)
 
 ---
 
