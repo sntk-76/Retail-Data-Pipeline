@@ -1,8 +1,8 @@
 # 🛠️ Retail Data Pipeline Project
 
-This project implements an end-to-end data pipeline using modern cloud and data engineering tools. It automates the flow of retail sales data from raw CSV upload to transformation, storage in BigQuery, and interactive visualization via Looker Studio.
+This project delivers a fully automated, end-to-end data pipeline for processing retail sales data using a modern cloud-native stack. It orchestrates the entire data lifecycle—from raw data ingestion to data transformation, cloud-based storage, and interactive dashboarding. Leveraging tools like Terraform, Docker, Apache Airflow, Google Cloud Storage (GCS), PySpark, BigQuery, and Looker Studio, the pipeline ensures scalability, maintainability, and real-time insight generation.
 
-📊 **[View Dashboard in Looker Studio](https://lookerstudio.google.com/reporting/32142238-71f8-4c7c-8dc2-45038440d426)**
+The pipeline starts with the upload of raw CSV retail data to GCS, triggered and scheduled through Airflow. The data is then loaded into BigQuery and transformed using PySpark in a Jupyter notebook, ensuring data cleanliness, normalization, and consistency. The cleaned data is re-uploaded to GCS and automatically loaded into a new BigQuery table. Finally, the insights are visualized via a custom dashboard built in Looker Studio, enabling stakeholders to track KPIs, customer behavior, and product trends in real time.
 
 ---
 
@@ -59,31 +59,58 @@ Retail-Data-Pipeline/
 
 ## 📌 Pipeline Phases
 
-### Phase 1: Infrastructure Setup
-- Provisioned a GCP Bucket and BigQuery dataset using Terraform.
+### 🚧 Phase 1: Infrastructure Setup (IaC with Terraform)
+- Designed and provisioned core cloud resources using **Terraform** to ensure reproducibility and scalability.
+- Created:
+  - A **Google Cloud Storage (GCS)** bucket to store raw and transformed data.
+  - A **BigQuery dataset** to store structured data for querying and analytics.
+- This approach promotes infrastructure version control, modularity, and ease of deployment.
 
-### Phase 2: Raw Data Ingestion
-- Created Airflow DAG to upload CSV to GCS.
-- Created another DAG to load it from GCS to BigQuery.
+---
 
-### Phase 3: Data Transformation
-- Performed transformation in Jupyter using PySpark.
-- Cleaned, casted, deduplicated, and standardized the data.
-- Exported the transformed data as CSV.
+### 📥 Phase 2: Raw Data Ingestion (Airflow ETL Scheduling)
+- Developed a **custom Airflow DAG** to automate the upload of the raw CSV retail data to GCS.
+- Implemented a second DAG to load the raw data from GCS into a **BigQuery staging table** using the `GCSToBigQueryOperator`.
+- Ensured schema definition and ingestion reliability with retry mechanisms and manual triggering capabilities.
 
-### Phase 4: Load Transformed Data
-- Used Airflow DAG to upload cleaned data to GCS.
-- Loaded it to a new BigQuery table using another DAG.
+---
 
-### Phase 5: Visualization
-- Built interactive dashboard in Looker Studio with charts and filters.
-- Link: [Retail Looker Dashboard](https://lookerstudio.google.com/reporting/32142238-71f8-4c7c-8dc2-45038440d426)
+### 🧹 Phase 3: Data Transformation (PySpark + Jupyter Notebook)
+- Utilized **PySpark** inside a **Jupyter Notebook** for scalable transformation of raw data.
+- Transformation tasks included:
+  - Data type casting (e.g., strings → integers, dates, floats).
+  - Dropping PII fields (e.g., name, email, phone) to ensure privacy.
+  - Handling missing values with `dropna` and `fillna`.
+  - Filtering invalid data (e.g., negative amounts, ratings outside valid range).
+  - Normalizing categorical values (e.g., trimming/standardizing with lowercase).
+  - Renaming columns to **snake_case** for consistency with BigQuery conventions.
+- The final cleaned dataset was saved as a **CSV** file, ready for downstream processing.
+
+---
+
+### 📤 Phase 4: Load Transformed Data (Airflow → BigQuery)
+- Another **Airflow DAG** was developed to:
+  - Upload the cleaned CSV back to a new folder in the GCS bucket.
+  - Load the cleaned file into a **new BigQuery table** in the previously created dataset.
+- Used `WRITE_TRUNCATE` mode to ensure clean and idempotent uploads during DAG re-runs.
+
+---
+
+### 📊 Phase 5: Visualization & Dashboarding (Looker Studio)
+- Connected the cleaned BigQuery table to **Google Looker Studio**.
+- Built an **interactive dashboard** showcasing:
+  - Customer segmentation by demographics.
+  - Sales distribution by region and product.
+  - Revenue and transaction trends.
+  - Rating insights and product category breakdowns.
+- Added filtering options to support stakeholder self-service exploration.
+- Dashboard Link: 👉 [Retail Looker Dashboard](https://lookerstudio.google.com/reporting/32142238-71f8-4c7c-8dc2-45038440d426)
 
 ---
 
 ## 📸 Pipeline Architecture Diagram
 
-![Pipeline Diagram](Dashboard/report/Retail_data_pipeline.pdf)
+![Pipeline Diagram](pipeline_diagram.png)
 
 ---
 
