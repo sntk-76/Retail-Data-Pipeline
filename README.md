@@ -14,16 +14,17 @@ The pipeline starts with the upload of raw CSV retail data to GCS, triggered and
 
 ```mermaid
 graph LR
-    A[Terraform Setup] --> B(GCP Infrastructure: GCS & BigQuery)
+    A[Terraform Setup] --> B[GCP Infrastructure: GCS & BigQuery]
     B --> C[Upload Raw Data via Airflow]
     C --> D[Raw Data in GCS Bucket]
-    D --> E[Load Raw Data to BigQuery (Airflow)]
+    D --> E[Load Raw Data to BigQuery via Airflow]
     D --> F[Jupyter Notebook for Transformation]
     F --> G[PySpark Data Cleaning & Preprocessing]
     G --> H[Export Cleaned CSV]
-    H --> I[Upload Cleaned Data to GCS (Airflow)]
-    I --> J[Load Cleaned Data to BigQuery (Airflow)]
+    H --> I[Upload Cleaned Data to GCS via Airflow]
+    I --> J[Load Cleaned Data to BigQuery via Airflow]
     J --> K[Visualize with Looker Studio]
+
 
 ```
 
