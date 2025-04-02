@@ -19,13 +19,14 @@ graph TD
     A[Terraform: GCP Infrastructure Setup] --> B[GCS Bucket + BigQuery Dataset]
     B --> C[Upload Raw CSV via Airflow DAG 1]
     C --> D[Raw Data Stored in GCS Bucket]
-    D --> E[Raw Data Ingested to BigQuery (Airflow DAG 2)]
+    D --> E[Raw Data Ingested to BigQuery - Airflow DAG 2]
     D --> F[Jupyter Notebook for PySpark Transformation]
     F --> G[Cleaned CSV Output Locally]
-    G --> H[Upload Cleaned CSV to GCS (Airflow DAG 3)]
-    H --> I[Load Cleaned Data to BigQuery (Airflow DAG 4)]
+    G --> H[Upload Cleaned CSV to GCS - Airflow DAG 3]
+    H --> I[Load Cleaned Data to BigQuery - Airflow DAG 4]
     I --> J[Dashboard Construction with Looker Studio]
 ```
+
 
 ---
 
