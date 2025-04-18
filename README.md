@@ -120,9 +120,6 @@ This project demonstrates a production-grade implementation of cloud data engine
 - Proper separation between raw and transformed data workflows for lineage and compliance
 - Real-world experience in technologies used by leading tech companies
 - Readiness for professional deployment and CI/CD integration
-
-Applicable job roles: Data Engineer, Analytics Engineer, Cloud Engineer, BI Developer
-
 ---
 
 ## License
