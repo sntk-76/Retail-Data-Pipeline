@@ -1,134 +1,212 @@
-# Retail Data Pipeline Project
+![Retail Data Pipeline cover](assets/retail-data-pipeline-cover.png)
 
-This repository presents a robust, enterprise-ready, cloud-native data pipeline designed for the complete processing, transformation, and visualization of retail transaction data. Built with production-level best practices in mind, the architecture not only enables full automation but also prioritizes modularity, scalability, maintainability, and secure data handling. The system leverages a suite of industry-standard technologies, including Terraform, Docker, Apache Airflow, PySpark, Google Cloud Storage (GCS), BigQuery, and Looker Studio.
+# Retail Data Pipeline
 
-The pipeline orchestrates every stage of the data lifecycle, from raw ingestion to transformation and final business insight generation. It simulates the operational role of a cloud data engineer and provides a scalable foundation for batch processing with extensibility for real-time streaming use cases. The approach adheres to infrastructure-as-code principles and incorporates best practices in workflow orchestration, distributed processing, and cloud-native analytics.
+**End-to-end cloud data engineering pipeline for retail transaction analytics using Terraform, Docker, Apache Airflow, Google Cloud Storage, Dataproc/PySpark, BigQuery, SQL validation, and Looker Studio.**
 
----
+[GitHub profile](https://github.com/sntk-76) | [Looker Studio dashboard](https://lookerstudio.google.com/reporting/32142238-71f8-4c7c-8dc2-45038440d426) | [Dashboard PDF](Dashboard/report/Retail_data_pipeline.pdf)
 
-## Pipeline Architecture Diagram
+## Overview
 
-![Pipeline Diagram](pipeline_diagram.png)
+Retail Data Pipeline is a cloud-native batch data engineering project that moves retail transaction data from local CSV ingestion into Google Cloud Storage, BigQuery warehouse tables, PySpark transformation logic, validation queries, and a business-facing Looker Studio dashboard.
 
----
+The project is designed to demonstrate the full lifecycle of a modern analytics platform: infrastructure provisioning, raw data ingestion, warehouse loading, data cleaning, privacy-aware transformation, schema-controlled BigQuery delivery, SQL-based validation, and BI reporting.
 
-## Pipeline Flow Overview (Mermaid)
+## Why This Project Matters
+
+Retail analytics is a practical data engineering use case because transaction datasets combine customer attributes, product metadata, payment behavior, geography, time dimensions, and revenue measures. A useful pipeline must preserve raw traceability while also producing clean analytical tables that business users can trust.
+
+This repository shows the kind of cross-layer work expected from a data engineer: cloud infrastructure, orchestration, distributed transformation, warehouse schemas, data quality checks, and dashboard enablement.
+
+## Core Capabilities
+
+| Capability | Implementation |
+| --- | --- |
+| Infrastructure as code | Terraform provisions a GCS bucket, raw and transformed BigQuery datasets, and a Dataproc cluster foundation. |
+| Local orchestration | Docker Compose provides the local Airflow runtime. |
+| Raw ingestion | Airflow uploads `retail_new_data.csv` to GCS under `raw/retail_raw_data.csv`. |
+| Raw warehouse load | Airflow loads the raw CSV from GCS into BigQuery with an explicit schema. |
+| Distributed transformation | PySpark casts types, removes duplicates, handles nulls, filters invalid values, normalizes categories, and removes sensitive fields. |
+| Clean data delivery | Airflow uploads `final_clean_data.csv` to GCS and loads it into a transformed BigQuery dataset. |
+| Quality validation | SQL checks validate nulls, duplicate transactions, date anomalies, negative purchases, and payment-method categories. |
+| BI reporting | Looker Studio presents the cleaned retail data as an analytics dashboard. |
+
+## Architecture
 
 ```mermaid
-graph TD
-    A[Terraform: GCP Infrastructure Setup] --> B[GCS Bucket + BigQuery Dataset]
-    B --> C[Upload Raw CSV via Airflow DAG 1]
-    C --> D[Raw Data Stored in GCS Bucket]
-    D --> E[Raw Data Ingested to BigQuery - Airflow DAG 2]
-    D --> F[Jupyter Notebook for PySpark Transformation]
-    F --> G[Cleaned CSV Output Locally]
-    G --> H[Upload Cleaned CSV to GCS - Airflow DAG 3]
-    H --> I[Load Cleaned Data to BigQuery - Airflow DAG 4]
-    I --> J[Dashboard Construction with Looker Studio]
+flowchart LR
+    A[Terraform] --> B[GCP foundation]
+    B --> C[GCS bucket]
+    B --> D[BigQuery datasets]
+    B --> E[Dataproc cluster]
+
+    F[Retail CSV] --> G[Airflow: upload_to_gcs_raw_data_dag]
+    G --> H[GCS raw/retail_raw_data.csv]
+    H --> I[Airflow: bucket_raw_data_to_bigquery]
+    I --> J[BigQuery raw retail table]
+
+    H --> K[PySpark transformation notebook]
+    K --> L[Local final_clean_data.csv]
+    L --> M[Airflow: upload_to_gcs_dag]
+    M --> N[GCS clean/retail_clean_data.csv]
+    N --> O[Airflow: bucket_to_bigquery]
+    O --> P[BigQuery transformed retail table]
+
+    P --> Q[SQL validation]
+    P --> R[Looker Studio dashboard]
 ```
 
+## Technical Stack
 
----
+| Layer | Tools |
+| --- | --- |
+| Infrastructure | Terraform, Google Cloud Platform |
+| Storage | Google Cloud Storage |
+| Processing foundation | Google Dataproc, PySpark |
+| Orchestration | Apache Airflow, Docker Compose |
+| Warehouse | BigQuery |
+| Data quality | BigQuery SQL validation queries |
+| BI | Looker Studio |
+| Development | Jupyter notebooks, Python |
 
-## Project Directory Structure
+## Repository Structure
 
-```
+```text
 Retail-Data-Pipeline/
-├── Infrastructure/           # Terraform modules for GCP resource provisioning
-├── Airflow/                  # Workflow DAGs, data, and credentials
-│   ├── dags/                 # DAGs for raw and cleaned data ETL flows
-│   ├── data/                 # Local staging for CSV files
-│   ├── keys/                 # GCP service account credentials
-├── Notebooks/                # PySpark transformation notebooks
-├── Dashboard/                # Looker Studio PDF snapshot
-├── Scripts/                  # Custom helper scripts (optional)
-├── requirements.txt          # Python package dependencies
-├── Makefile                  # Optional automation tasks
-└── README.md
+|-- Airflow/
+|   |-- dags/                         # DAGs for raw and clean data movement
+|   `-- docker-compose.yaml            # Local Airflow runtime
+|-- Dashboard/
+|   `-- report/
+|       `-- Retail_data_pipeline.pdf   # Exported Looker Studio report
+|-- Data/                              # Local data staging placeholder
+|-- Infrastructure/                    # Terraform GCP configuration
+|-- Notebooks/
+|   |-- transformation.ipynb           # PySpark transformation workflow
+|   `-- convert_to _int.ipynb          # Type-conversion exploration
+|-- Scripts/                           # Helper script placeholder
+|-- assets/
+|   `-- retail-data-pipeline-cover.png
+|-- Query.txt                          # BigQuery validation queries
+|-- pipeline_diagram.png               # Legacy architecture diagram
+|-- requirements.txt
+|-- LICENSE
+`-- README.md
 ```
 
----
+## Pipeline Workflow
 
-## Technology Stack
+1. Provision the GCP foundation with Terraform.
+2. Run Airflow locally with Docker Compose.
+3. Upload the raw retail CSV into Google Cloud Storage.
+4. Load the raw GCS object into BigQuery using a controlled schema.
+5. Transform the dataset with PySpark in Jupyter.
+6. Remove personally identifiable fields from the clean analytical output.
+7. Filter invalid business values such as negative amounts, invalid ages, and ratings outside the expected range.
+8. Normalize categorical fields and create a clean schema.
+9. Upload the cleaned CSV to GCS.
+10. Load the cleaned data into the transformed BigQuery dataset.
+11. Run SQL validation checks against warehouse data.
+12. Build a Looker Studio dashboard for business analysis.
 
-| Tool/Service        | Role & Purpose                                                |
-| ------------------- | ------------------------------------------------------------- |
-| Terraform           | Infrastructure as Code for provisioning GCP resources         |
-| GCP: GCS & BigQuery | Cloud storage for raw/processed data and cloud data warehouse |
-| Apache Airflow      | DAG-based orchestration and scheduling of ETL workflows       |
-| PySpark             | Distributed data processing framework for transformation      |
-| Jupyter Notebook    | Interactive data exploration and PySpark development          |
-| Looker Studio       | Cloud-native BI platform for dashboarding and analytics       |
-| Docker              | Local development and orchestration of Airflow environment    |
+## Airflow DAGs
 
----
+| DAG | File | Purpose |
+| --- | --- | --- |
+| `upload_to_gcs_raw_data_dag` | `Airflow/dags/upload_to_GCS_raw_data.py` | Uploads local raw retail data into the GCS raw zone. |
+| `bucket_raw_data_to_bigquery` | `Airflow/dags/GCS_to_bigquery_raw_data.py` | Loads raw GCS data into the BigQuery raw table. |
+| `upload_to_gcs_dag` | `Airflow/dags/upload_to_GCS_clean_data.py` | Uploads the transformed clean CSV into the GCS clean zone. |
+| `bucket_to_bigquery` | `Airflow/dags/GCS_to_bigquery_clean_data.py` | Loads clean GCS data into the transformed BigQuery table. |
 
-## Pipeline Phases (Detailed Execution Plan)
+## Terraform Infrastructure
 
-### Phase 1: Infrastructure Provisioning with Terraform
+The Terraform layer provisions:
 
-- Provisioned key Google Cloud resources using declarative, version-controlled Terraform scripts.
-- Deployed a GCS bucket for data lake storage and a BigQuery dataset for analytical querying.
-- Ensured reproducibility and modularity through isolated resource modules and parameterization.
-- The foundation supports future CI/CD automation and secure secret management.
+- A Google Cloud Storage bucket for raw and clean data assets.
+- A BigQuery dataset for raw retail data.
+- A BigQuery dataset for transformed retail data.
+- A Dataproc cluster foundation for Spark processing.
 
-### Phase 2: Raw Data Ingestion Pipeline (Airflow)
+```bash
+cd Infrastructure
+terraform init
+terraform plan
+terraform apply
+```
 
-- Built Airflow DAG 1 to upload retail CSV data into GCS.
-- Implemented Airflow DAG 2 to transfer GCS data into a BigQuery staging table.
-- Included retry logic, parameterization, logging, and schema enforcement.
-- A modular DAG structure promotes reusability and supports multi-environment deployment.
+## Transformation Logic
 
-### Phase 3: Data Transformation (PySpark via Jupyter Notebook)
+The PySpark transformation notebook prepares raw retail records for analytics by applying practical data engineering rules:
 
-- Utilized PySpark within a Jupyter notebook for high-scale local transformation.
-- Applied a multi-step ETL procedure including:
-  - Schema casting for numeric, categorical, and temporal fields
-  - Removal of Personally Identifiable Information (PII)
-  - Handling nulls via imputation and filtering
-  - Normalization of categorical values
-  - Business logic-based filtering (e.g., remove invalid ratings/age)
-  - Column name standardization (snake\_case)
-- Output saved locally as a cleaned CSV file for subsequent loading.
+- Casts transaction, customer, purchase, amount, date, and rating fields to analytical types.
+- Removes duplicate records.
+- Drops records missing critical measures such as transaction ID, customer ID, amount, and total amount.
+- Fills selected missing categorical and demographic fields with controlled defaults.
+- Removes personally identifiable columns including name, email, phone, and address.
+- Filters invalid values for amount, total amount, age, and rating.
+- Standardizes categorical fields with lowercasing and trimming.
+- Produces a snake_case clean output for downstream loading.
 
-### Phase 4: Cleaned Data Loading
+## Data Validation
 
-- Airflow DAG 3 re-uploaded the transformed dataset to GCS.
-- Airflow DAG 4 loaded the cleaned data into a production-grade BigQuery table.
-- Write operations followed `WRITE_TRUNCATE` semantics to preserve consistency and reproducibility.
-- Clearly separate raw and clean pipelines for auditability and traceability.
+`Query.txt` contains BigQuery checks for warehouse validation, including:
 
-### Phase 5: Visualization with Looker Studio
+- Row-count verification.
+- Null checks for key business fields.
+- Earliest and latest transaction dates.
+- Future-date detection.
+- Duplicate transaction detection.
+- Negative purchase checks.
+- Payment-method category inspection.
 
-- Connected Looker Studio to the clean BigQuery dataset.
-- Designed an interactive dashboard comprising:
-  - Aggregated insights on regional, temporal, and demographic breakdowns
-  - Transaction and revenue trends
-  - Product category sales
-  - Customer feedback and satisfaction metrics
-- Enhanced with filtering, drill-downs, and responsive components.
-- Dashboard link (public): [Retail Looker Dashboard](https://lookerstudio.google.com/reporting/32142238-71f8-4c7c-8dc2-45038440d426)
+## Dashboard Layer
 
----
+The Looker Studio dashboard turns the transformed BigQuery data into a business-facing report for retail analysis. It is designed to support exploration of transaction patterns, customer segments, revenue behavior, product categories, payment behavior, and geographic trends.
 
-## Project Outcomes & Professional Relevance
+- Public dashboard: [Retail Looker Dashboard](https://lookerstudio.google.com/reporting/32142238-71f8-4c7c-8dc2-45038440d426)
+- PDF export: [Dashboard/report/Retail_data_pipeline.pdf](Dashboard/report/Retail_data_pipeline.pdf)
 
-This project demonstrates a production-grade implementation of cloud data engineering principles and toolsets. It showcases:
+## Running Locally
 
-- A complete, automated ETL pipeline built on open-source and cloud-native infrastructure
-- Integration of IaC, workflow orchestration, distributed data processing, and cloud BI
-- Proper separation between raw and transformed data workflows for lineage and compliance
-- Real-world experience in technologies used by leading tech companies
-- Readiness for professional deployment and CI/CD integration
----
+```bash
+git clone https://github.com/sntk-76/Retail-Data-Pipeline.git
+cd Retail-Data-Pipeline
+```
+
+Provision infrastructure:
+
+```bash
+cd Infrastructure
+terraform init
+terraform plan
+terraform apply
+```
+
+Start Airflow:
+
+```bash
+cd ../Airflow
+docker-compose up
+```
+
+Then open the Airflow UI at `http://localhost:8080` and trigger the DAGs in pipeline order.
+
+## Project Highlights
+
+- Demonstrates the complete journey from raw retail CSV to cloud warehouse and BI reporting.
+- Separates raw and transformed warehouse layers for traceability.
+- Uses explicit BigQuery schemas instead of relying on uncontrolled inference.
+- Applies privacy-aware data transformation by removing direct customer identifiers from the clean dataset.
+- Combines infrastructure, orchestration, distributed processing, SQL validation, and dashboard delivery in one portfolio project.
+
+## Future Improvements
+
+- Convert the notebook transformation into a reusable PySpark job.
+- Connect Airflow directly to the Dataproc transformation step.
+- Add automated dependencies between DAGs for a single end-to-end run.
+- Add CI checks for DAG imports and Terraform formatting.
+- Add Great Expectations or dbt tests for structured data quality enforcement.
 
 ## License
 
-Distributed under the MIT License.
-
----
-
-## Author
-
-Developed by Sina Tavakoli
-
+This project is licensed under the [MIT License](LICENSE).
